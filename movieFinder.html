@@ -1,0 +1,159 @@
+//html
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Movie Finder</title>
+	<link rel="stylesheet" type="text/css" href="movie_finder.css">
+</head>
+<body>
+	<div class="about_body">
+	<div class="full_body">
+		<div class="title">Movie Finder</div>
+		<div class="search-box">
+			<input type="text" placeholder="search" class="form-input" id="search-input">
+			<button class="search">Search</button>
+		</div>
+	</div>
+    <div class="movie-cards"></div>
+    </div>
+</body>
+<script src="../javascript/movie_finder.js"></script>
+
+<script type="text/javascript" href="movie_finder.js"></script>
+</html>
+
+
+
+//css
+.about_body{
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 0px;
+	font-size: 18px;
+	background-color: rgb(233,233,233);
+	font-family: 'Lucida sans','Lucida sans regular',sans-serif;
+}
+.title{
+	font-size: 30px;
+	font-weight: 600;
+	color: white;
+	background-color: rgb(19, 19, 56);
+	width: 100%;
+	padding: 20px;
+	text-align: center;
+}
+.full_body{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+.form-input{
+	border: none;
+	outline: none;
+	background-color: white;
+	padding: 10px 20px;
+	border: 1px solid grey;
+	margin-right: 20px;
+}
+.form_input:focus{
+	background-color: white;
+}
+.search{
+	border: none;
+	outline: none;
+	background-color: lightblue;
+	padding: 10px 20px;
+	font font-family: 'Lucida sans',sans-serif;
+}
+.search-box{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 100px;
+}
+.movie-cards{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+.cards{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: white;
+	background-color: rgb(24, 51, 59);
+	margin: 20px;
+	padding: 30px;
+	width: 700px;
+}
+.movie-title{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 300px;
+	margin: 0px 200px;
+}
+.value{
+	font-size: 15px;
+	width: 200px;
+}
+
+
+
+
+
+//js
+const API_URL = "http://www.omdbapi.com/?i=tt3896198&apikey=6b5f4c34&s=";
+const API_URL_SEARCH = "http://www.omdbapi.com/?apikey=6b5f4c34&i="
+
+var search_input = document.getElementById("search_input");
+var card = document.getElementByClassName("movie-cards")[0];
+
+document.getElementByClassName("search")[0].addEventListener("click",function(){
+	console.log(search_input.value);
+	const query = search_input.value;
+	if(query){
+		getMovies(API_URL+query);
+	}
+});
+
+async function getMovies(url){
+	const resp = await fetch(url);
+	const respData = await resp.json();
+	console.log(respData);
+	showMovies(respData.Search);
+}
+
+function showMovies(movies){
+	card.innerHTML="";
+	movies.forEach(async function(movie){
+		const movieData = await fetch(API_URL_SEARCH+movie.imdbID);
+		const movieDataobj = await movieData.json();
+		movie_display(movieDataobj);
+	});
+}
+
+function movie_display(imovie){
+	const movieElm = document.createElement("div");
+	movieElm.classList.add("movie-cards");
+	movieElm.innerHTML=`
+	    <div class="card">
+	        <img src= "$(imovie.Poster)" alt = "Poster" width = "300px" height= "300px"/>
+	        <br>
+	        <div class="movie_description">
+	            <span class="movie.title"><b>Title</b><span class="value">${imovie.title}</span></span>
+	            <span class="movie.title"><b>Rating</b><span class="value">${imovie.imdbRating}</span></span>
+	            <span class="movie.title"><b>Director</b><span class="value">${imovie.Director}</span></span>
+	            <span class="movie.title"><b>Released Date</b><span class="value">${imovie.Released}</span></span>
+	            <span class="movie.title"><b>Genre</b><span class="value">${imovie.Genre}</span></span>
+
+
+	        </div>
+	    </div>    
+	`;
+	card.appendChild(movieElm);
+}
